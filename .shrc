@@ -1,0 +1,95 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2023-2025 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: MIT
+
+# shellcheck disable=SC2033
+# shellcheck disable=SC2032
+
+# If not in interactive mode, then exit...
+case $- in
+  *i*) ;;
+  *) exit ;;
+esac
+
+# Enable Vi key-bindings, because Vi is great...
+set -o vi
+
+# Useful shortcuts...
+alias ..='cd ..'
+alias r='fc -s'
+alias ls='ls --color=auto'
+alias la='ls -a'
+alias ll='ls -l'
+alias lla='ls -al'
+alias l.='ls -d .*'
+alias less='less -FX'
+alias grep='grep --color=auto'
+alias fgrep='grep --color=auto'
+alias egrep='grep -E --color=auto'
+alias root='sudo -i'
+alias tmux='tmux -u'
+
+# Avoid removing/overwriting existing files...
+cp()
+{
+  if [ -t 0 ]; then
+    command cp -iv "$@"
+  else
+    command cp -v "$@"
+  fi
+}
+
+mv()
+{
+  if [ -t 0 ]; then
+    command mv -iv "$@"
+  else
+    command mv -v "$@"
+  fi
+}
+
+# If removing multiple files then add -f...
+rm()
+{
+  if [ -t 0 ]; then
+    command rm -iv "$@"
+  else
+    command rm -v "$@"
+  fi
+}
+
+# Enable settings for wget...
+if command -v wget >/dev/null 2>&1; then
+  wget()
+  {
+    command wget -c --hsts-file="${XDG_CACHE_HOME:-$HOME/.cache}/wget-hsts" "$@"
+  }
+fi
+
+# If Vim is installed, then add any aliases for it.
+if command -v vim >/dev/null 2>&1; then
+  view()
+  {
+    vim -R "$@"
+  }
+
+  svim()
+  {
+    sudo vim "$@"
+  }
+
+  svi()
+  {
+    sudo vim "$@"
+  }
+fi
+
+# Setup PS1 using external script dependency if available...
+if [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/polyglot.sh" ]; then
+  # shellcheck source=/dev/null
+  . "${XDG_DATA_HOME:-$HOME/.local/share}/polyglot.sh"
+else
+  echo "could not find polyglot.sh, using default PS1" 2>&1
+  PS1="$(logname)@$(uname -n) $PWD/ \$ "
+  export PS1
+fi
