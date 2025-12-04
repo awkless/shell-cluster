@@ -2,3 +2,4 @@
 description = "Shell configuration cluster"
 url = "git@github.com:awkless/shell-cluster.git"
 work_tree_alias = "$HOME"
+include = [".profile", ".shrc", "/.local/share/"]
