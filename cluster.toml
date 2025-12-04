@@ -1,0 +1,4 @@
+[settings]
+description = "dotfiles for different shells"
+url = "<put url to remote here>"
+work_tree_alias = "$HOME"
