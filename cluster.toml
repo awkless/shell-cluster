@@ -1,4 +1,4 @@
 [settings]
-description = "dotfiles for different shells"
-url = "<put url to remote here>"
+description = "Shell configuration cluster"
+url = "git@github.com:awkless/shell-cluster.git"
 work_tree_alias = "$HOME"
