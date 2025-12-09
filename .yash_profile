@@ -11,7 +11,7 @@ else
 fi
 
 # Load in .yashrc...
-if [ -f "$HOME/.bashrc" ]; then
+if [ -f "$HOME/.yashrc" ]; then
   # shellcheck source=/dev/null
   . "$HOME/.yashrc"
 else

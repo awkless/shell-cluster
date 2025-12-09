@@ -1,0 +1,81 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2023-2024 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: MIT
+
+# shellcheck disable=SC3042
+
+# Add default shell environment...
+if [ -f "$HOME/.shrc" ]; then
+  # shellcheck source=/dev/null
+  . "$HOME/.shrc"
+else
+  echo ".shrc not found, environment maybe unstable" 2>&1
+fi
+
+# Enable bash-like extended expansion...
+set --brace-expand
+
+# Enable recursive pathname expansion...
+set --extended-glob
+
+# Ensure job control works as expected...
+case $- in (*m*)
+  trap - TSTP TTIN TTOU
+esac
+
+if command --identify --builtin-command history > /dev/null; then
+  # Do not save commands starting with a space in history...
+  set --hist-space
+
+  # Prevent clearing history by accident...
+  history()
+  {
+    if [ -t 0 ] && (
+      for arg do
+        case "${arg}" in
+	  (-[drsw]?* | --*=*) ;;
+	  (-*c*) exit ;;
+	esac
+      done
+    ) then
+      printf 'history: seems you are trying to clear the whole history.\n' >&2
+      printf 'are you sure? (yes/no) ' >&2
+      case "$(head -n 1)" in
+        ([Yy]*) command history "$@" ;;
+	(*) printf 'history: cacelled\n' >&2
+      esac
+    else
+      command history "$@"
+    fi
+  }
+fi
+
+# Command history settings...
+HISTFILE="$HOME/.yash_history"
+HISTSIZE=1000
+
+# Set echo style...
+: "${ECHO_STYLE:=RAW}"
+
+# If Yash is built with line-editing enabled...
+if command --identify --builtin-command bindkey > /dev/null; then
+  # Print job status update ASAP, but only while line-editing...
+  set --notify-le
+
+  # Some terminfo data are broken; meta flags have to be ignored for UTF-8
+  set --le-no-conv-meta
+
+  # Enable command line prediction...
+  set --le-predict
+
+  # Keybindings for Vi mode...
+  bindkey --vi-command 'H' complete-prev-column
+  bindkey --vi-command 'L' complete-next-column
+  bindkey --vi-command 'J' complete-next-candidate
+  bindkey --vi-command 'K' complete-prev-candidate
+  bindkey --vi-insert '\^H' complete-prev-column
+  bindkey --vi-insert '\^L' complete-next-column
+  bindkey --vi-insert '\^J' complete-next-candidate
+  bindkey --vi-insert '\^K' complete-prev-candidate
+  bindkey --vi-insert '\^B' accept-prediction
+fi
