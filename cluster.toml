@@ -3,3 +3,7 @@ description = "Shell configuration cluster"
 remote = { url = "https://github.com/awkless/shell-cluster.git" }
 work_tree_alias = "$HOME"
 include = [".profile", ".shrc", "/.local/share/"]
+
+[[dependency]]
+name = "polyglot_ps1"
+remote = { url = "https://github.com/awkless-forks/polyglot.git", branch = "cluster" }
